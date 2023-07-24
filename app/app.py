@@ -3,10 +3,13 @@
 from flask import Flask, jsonify, request, make_response
 from flask_migrate import Migrate
 from models import db, Hero, Power, HeroPower
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+CORS(app)
 
 migrate = Migrate(app, db)
 
@@ -25,9 +28,9 @@ def get_heroes():
 
 @app.route('/heroes/<int:id>', methods=['GET'])
 def get_hero(id):
-    hero = Hero.query.get(id)
+    hero = db.session.query(Hero).get(id)
     if hero:
-        hero_data = hero.to_dict(include_powers=True)
+        hero_data = hero.to_dict(include_powers=True)  # Pass include_powers=True
         return jsonify(hero_data)
     else:
         return jsonify({'error': 'Hero not found'}), 404

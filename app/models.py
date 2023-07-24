@@ -17,6 +17,15 @@ class Hero(db.Model, SerializerMixin):
     name = db.Column(db.String(100), nullable=False)
     super_name = db.Column(db.String(100), nullable=False)
     hero_powers = db.relationship('HeroPower', backref='hero')
+    def to_dict(self, include_powers=False):
+        hero_data = {
+            'id': self.id,
+            'name': self.name,
+            'super_name': self.super_name,
+        }
+        if include_powers:
+            hero_data['powers'] = [hero_power.power.to_dict() for hero_power in self.hero_powers]
+        return hero_data
 
 
 class Power(db.Model, SerializerMixin):
@@ -26,6 +35,13 @@ class Power(db.Model, SerializerMixin):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200), nullable=False)
     hero_powers = db.relationship('HeroPower', backref='power')
+    def to_dict(self):
+        power_data = {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+        }
+        return power_data
 
     @validates('description')
     def validate_description(self, key, description):
@@ -41,8 +57,6 @@ class HeroPower(db.Model):
     strength = db.Column(db.String(10), nullable=False)
     power_id = db.Column(db.Integer, db.ForeignKey('power.id'), nullable=False)
     hero_id = db.Column(db.Integer, db.ForeignKey('hero.id'), nullable=False)
-    power = db.relationship('Power', backref='hero_powers')
-    hero = db.relationship('Hero', backref='hero_powers')
 
     @validates('strength')
     def validate_strength(self, key, strength):
@@ -51,3 +65,10 @@ class HeroPower(db.Model):
             raise ValueError("Strength must be one of the following values: 'Strong', 'Weak', 'Average'.")
         return strength
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'strength': self.strength,
+            'power_id': self.power_id,
+            'hero_id': self.hero_id,
+        }

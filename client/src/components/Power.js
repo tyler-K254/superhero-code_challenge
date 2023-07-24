@@ -10,7 +10,7 @@ function Power() {
   const { id } = useParams();
 
   useEffect(() => {
-    fetch(`/powers/${id}`).then((r) => {
+    fetch(`http://127.0.0.1:5555/powers/${id}`).then((r) => {
       if (r.ok) {
         r.json().then((power) =>
           setPower({ data: power, error: null, status: "resolved" })
@@ -31,10 +31,12 @@ function Power() {
       <h2>{power.name}</h2>
       <p>{power.description}</p>
       <p>
-        <Link to="/hero_powers/new">Add Hero Power</Link>
+      <Link to="/hero_powers/new">Add Hero Power</Link>
+
       </p>
       <p>
-        <Link to={`/powers/${power.id}/edit`}>Edit Power Description</Link>
+      <Link to={`/powers/${power.id}/edit`}>Edit Power Description</Link>
+
       </p>
     </section>
   );
